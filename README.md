@@ -1,6 +1,8 @@
 # MPC-SSY
 student id: 230597
 
+
+
 Devkit: ATmega256RFR2 Xplained Pro Design
 
 Extensions: 
@@ -10,3 +12,8 @@ Extensions:
 
 - [ ] [LAB1](./Laboratories/LAB1/)
 - [ ] [LAB2](./Laboratories/LAB2/)
+- [ ] [LAB3](./Laboratories/LAB3/)
+- [ ] [LAB4](./Laboratories/LAB4/)
+- [ ] [LAB5](./Laboratories/LAB5/)
+- [ ] [Project](./Laboratories/Projekt/)
+
