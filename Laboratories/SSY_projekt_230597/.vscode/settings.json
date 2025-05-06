@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "hal.h": "c",
+        "systypes.h": "c",
+        "halboard.h": "c",
+        "haluart.h": "c",
+        "main.h": "c"
+    }
+}
