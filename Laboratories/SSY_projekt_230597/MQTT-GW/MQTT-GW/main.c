@@ -1,49 +1,46 @@
 /*
- * LWM_MSSY.c
+ * main.c
  *
- * Created: 6.4.2017 15:42:46
- * Author : Krajsa
- */ 
+ *  Created on: 22 ????. 2018 ?.
+ *      Author: maxx
+ */
 
-/*- Includes ---------------------------------------------------------------*/
+
 #include <avr/io.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>git
-
-#include "stdbool.h"
+#include <util/delay.h>
+#include <avr/interrupt.h>
+#include <avr/pgmspace.h>
+#include <compat/deprecated.h>  //sbi, cbi etc..
+#include "avr/wdt.h" // WatchDog
+#include <stdio.h>  // printf etc..
 #include "spi.h"
 #include "string.h"
-#include "config.h"
-#include "main.h"
+
+#include "stdbool.h"
 #include "Ethernet/socket.h"
 #include "Ethernet/wizchip_conf.h"
 #include "Application/loopback/loopback.h"
 #include "Application/PING/ping.h"
-#include "Internet/DNS/dns.h"
 #include "Internet/MQTT/mqtt_interface.h"
 #include "Internet/MQTT/MQTTClient.h"
+
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include "config.h"
 #include "stack/hal/atmega256rfr2/inc/hal.h"
 #include "stack/phy/atmega256rfr2/inc/phy.h"
 #include "stack/sys/inc/sys.h"
 #include "stack/nwk/inc/nwk.h"
 #include "stack/sys/inc/sysTimer.h"
 #include "stack/hal/drivers/atmega256rfr2/inc/halBoard.h"
-#include "stack/hal/drivers/atmega256rfr2/inc/halUart.h" 
-
-/*
-#include <util/delay.h>
-#include <avr/interrupt.h>
-#include <avr/pgmspace.h>
-#include <compat/deprecated.h>  //sbi, cbi etc..
-#include "avr/wdt.h" // WatchDog
-#include "uart_extd.h"
-*/
+#include "stack/hal/drivers/atmega256rfr2/inc/halUart.h"
 
 
 
-/*- Definitions ------------------------------------------------------------*/
+//#define PING
+//#define LOOPBACK_TEST
+
 #define LOOPBACK_DATA_BUF_SIZE 512
 //SPI CLOCK 4 Mhz
 #define SPI_4_MHZ
@@ -55,15 +52,14 @@
 #define PRINTF(...)
 #endif
 #define UART_BAUD_RATE      38400
-#define DNS_INFO
 #define TICK_PER_SEC 1000UL
 // MQTT
 #define SOCK_MQTT       2
 // Receive Buffer
 #define MQTT_BUFFER_SIZE	512     // 2048
 // MQTT topics
-#define PUBLISH "topic/ssy/testpub"
-#define SUBSCRIBE "topic/ssy/testsub"
+#define PUBLISH "topic/ssy/test"
+#define SUBSCRIBE "topic/ssy/test"
 // MQTT end
 //LWM
 #ifdef NWK_ENABLE_SECURITY
@@ -73,18 +69,10 @@
 #endif
 // LWM end
 #define ETH_MAX_BUF_SIZE 512
-// DNS
-#define SOCK_DNS       6
-// DNS end
-/*
-#ifndef __AVR_ATmega256RFR2__ // for ATmega256RFR2
-#define __AVR_ATmega256RFR2__ // for ATmega256RFR2
-#endif
 
-#ifndef HAL_ATMEGA256RFR2
-#define HAL_ATMEGA256RFR2 // for ATmega256RFR2
-#endif
-*/
+#define LWM
+#define MQTT
+
 
 /*- Variables --------------------------------------------------------------*/
 // LWM
@@ -98,42 +86,28 @@ static char LWMmsg[128] = "";
 static int LWMlen = 0;
 // LWM end
 // MQTT
-uint8_t MQTT_targetIP[4] = {0, 0, 0, 0};      // MQTT broker IP
 static Client mqtt_client; // MQTT client
 uint8_t mqtt_readBuffer[MQTT_BUFFER_SIZE];
 volatile uint16_t mes_id;
-static char ClientID[32] = "mqttx_0e8304f0";
-static char ClientUsername[32] = "mqtt_projekt_x";
+static char ClientID[32] = "w5500_avr_client";
+static char ClientUsername[32] = "LWM->MQTT";
 static char ClientPassword[32] = "\0";
-// MQTT end
 extern unsigned long millis(void);
 volatile unsigned long _millis; // for millis tick !! Overflow every ~49.7 days
 uint8_t ping_ip[4] = { 192, 168, 53, 109 }; //Ping IP address
 //NIC metrics PC (IP configuration)
 wiz_NetInfo netInfo = { .mac  = {0x00, 0x08, 0xdc, 0xab, 0xcd, 0xef}, // Mac address
-		.ip   = {192, 168, 53, 199},         // IP address
-		.sn   = {255, 255, 255, 0},         // Subnet mask
-		.dns =  {8,8,8,8},			  // DNS address (google dns)
-		.gw   = {192, 168, 53, 1}, // Gateway address
-		.dhcp = NETINFO_STATIC};    //Static IP configuration
+.ip   = {192, 168, 53, 199},    // IP address
+.sn   = {255, 255, 255, 0},     // Subnet mask
+.dns =  {1,1,1,1},				// DNS address (clopudflare dns)
+.gw   = {192, 168, 53, 1}, 		// Gateway address
+.dhcp = NETINFO_STATIC};    	//Static IP configuration
+uint8_t MQTT_targetIP[4] = {192, 168, 0, 100}; 	// MQTT broker IP
+// MQTT end
 const char str_prog_name[] PROGMEM   = "\r\nAtMega256RFR2 LWM -> MQTT Gateway WIZNET_5500 ETHERNET\r\n"; // Program name
-
+const char PROGMEM str_mcu[] = "ATmega256RFR2"; //CPU is m256rfr2
 static char _msg[64] = "\0";
 static int _len;
-//***************** DNS: BEGIN
-//////////////////////////////////////////////////
-// Socket & Port number definition for Examples //
-//////////////////////////////////////////////////
-
-unsigned char gDATABUF_DNS[ETH_MAX_BUF_SIZE];
-
-////////////////
-// DNS client //
-////////////////
-uint8_t DNS_2nd[4]    = {192, 168, 53, 1};      	// Secondary DNS server IP
-uint8_t Domain_name[] = "broker.emqx.io";    		// domain name
-uint8_t Domain_IP[4]  = {0, };               		// Translated IP address by DNS Server
-//***************** DNS: END
 
 
 /*- Prototypes -------------------------------------------------------------*/
@@ -163,8 +137,7 @@ void icmp_cb(uint8_t socket,\
 		uint16_t seq_query,\
 		uint16_t len_query);
 
-
-//***************** LWM: BEGIN
+#ifdef LWM //LWM begin
 /*- Types ------------------------------------------------------------------*/
 typedef enum AppState_t
 {
@@ -176,16 +149,14 @@ static AppState_t appState = APP_STATE_INITIAL;
 
 /*- Implementations --------------------------------------------------------*/
 
-/*************************************************************************//**
-*****************************************************************************/
+
 static void appDataConf(NWK_DataReq_t *req)
 {
 appDataReqBusy = false;
 (void)req;
 }
 
-/*************************************************************************//**
-*****************************************************************************/
+
 static void appSendData(void)
 {
 if (appDataReqBusy || 0 == appUartBufferPtr)
@@ -206,8 +177,7 @@ appUartBufferPtr = 0;
 appDataReqBusy = true;
 }
 
-/*************************************************************************//**
-*****************************************************************************/
+
 void HAL_UartBytesReceived(uint16_t bytes)
 {
 for (uint16_t i = 0; i < bytes; i++)
@@ -223,6 +193,15 @@ appUartBuffer[appUartBufferPtr++] = byte;
 
 SYS_TimerStop(&appTimer);
 SYS_TimerStart(&appTimer);
+}
+
+void HAL_UartWriteString(char *text)
+{
+	while (*text != 0x00)
+	{
+		HAL_UartWriteByte(*text);
+		text++;
+	}
 }
 
 
@@ -284,9 +263,9 @@ default:
 break;
 }
 }
+#endif //LWM end
 
-//***************** LWM: END
-
+#ifdef MQTT //MQTT begin
 
 //***********Prologue for fast WDT disable & and save reason of reset/power-up: BEGIN
 uint8_t mcucsr_mirror __attribute__ ((section (".noinit")));
@@ -318,52 +297,30 @@ void messageArrived(MessageData* md)
 	strncpy(_message, message->payload, message->payloadlen);
 	
 	_len = SPRINTF(_msg,"<<MQTT Sub: [%s] %s", _topic_name , _message);
-	HAL_UARTWriteString(_msg);
+	HAL_UartWriteString(_msg);
 	
-	
-	// Check if it is received message (received message must contain { char)
-	char * ptr;
-	int    ch = '{';
-	ptr = strchr(_msg, ch );
-	
-	if (ptr!=NULL)
-	{
-	int i_1;
-	int i_2;
-	char str_1[15], str_2[14], str_3[2];
-	int mqtt_timer = 0;
+	// Parse the MQTT message for configuration
+	if (strstr(_message, "set_lwm_config") != NULL) {
+        uint16_t new_addr, new_panid;
+        uint8_t new_channel;
 
-	// Getting values from string
-	// Message must be like {"mqtt_timer": 5000 ,"vypis_cau": 1 }
-	sscanf (_message,"%15s%d%14s%d%s",str_1,&i_1,str_2,&i_2,str_3);
-	// Checking if string contain substring
-	if (strstr(str_1, "mqtt_timer") != NULL) {
-		mqtt_timer=i_1;
-		strcpy(_msg, "");
-		_len = SPRINTF(_msg,"\r\nHodnota promenne mqtt_timer je: %d\r\n", mqtt_timer);
-		HAL_UARTWriteString(_msg);
-	} else if (strstr(str_2, "mqtt_timer") != NULL)
-	{
-		mqtt_timer=i_2;
-		strcpy(_msg, "");
-		_len = SPRINTF(_msg,"\r\nHodnota promenne mqtt_timer je: %d\r\n", mqtt_timer);
-		HAL_UARTWriteString(_msg);
-	} 
-	// Checking if string contain substring
-	if (strstr(str_1, "vypis_cau") != NULL)
-	{
-		if (i_1==1)
-		{
-			HAL_UARTWriteString("\r\nCau\r\n");
-		}
-	} else if (strstr(str_2, "vypis_cau") != NULL)
-	{
-		if (i_2==1)
-		{
-			HAL_UARTWriteString("\r\nCau\r\n");
-		}
-	}	
-	}
+        // Example message: {"set_lwm_config": {"addr": 2, "panid": 0x1234, "channel": 15}}
+        if (sscanf(_message, "{\"set_lwm_config\": {\"addr\": %hu, \"panid\": %hx, \"channel\": %hhu}}",
+                   &new_addr, &new_panid, &new_channel) == 3) {
+            // Update LWM configuration
+            NWK_SetAddr(new_addr);
+            NWK_SetPanId(new_panid);
+            PHY_SetChannel(new_channel);
+
+            // Acknowledge the configuration change
+            strcpy(_msg, "");
+            _len = SPRINTF(_msg, "LWM Config Updated: addr=%u, panid=0x%04X, channel=%u\r\n",
+                           new_addr, new_panid, new_channel);
+            HAL_UartWriteString(_msg);
+        } else {
+            HAL_UartWriteString("Invalid LWM configuration message format.\r\n");
+        }
+    }
 }
 
 void mqtt_pub(Client* mqtt_client, char * mqtt_topic, char * mqtt_msg, int mqtt_msg_len)
@@ -429,7 +386,6 @@ unsigned long millis(void)
 	return i;
 }
 //******************* MILLIS ENGINE: END
-
 
 //***************** WIZCHIP INIT: BEGIN
 
@@ -513,6 +469,7 @@ void icmp_cb(uint8_t socket,\
 			len_query);
 }
 
+
 // Timer0
 // 1ms IRQ
 // Used for millis() timing
@@ -530,9 +487,10 @@ static void avr_init(void)
 	// WatchDog INIT
 	wdt_enable(WDTO_8S);  // set up wdt reset interval 2 second
 	wdt_reset(); // wdt reset ~ every <2000ms
-	HAL_UartInit(UART_BAUD_RATE); // UART init
+
 	timer0_init();// Timer0 millis engine init
-	
+	HAL_UartInit(UART_BAUD_RATE);
+	spi_init(); // SPI init for WIZNET chip
 	sei(); //re-enable global interrupts
 
 	return;
@@ -559,122 +517,28 @@ void print_network_information(void)
 	printf("Gate way   : %d.%d.%d.%d\n\r",gWIZNETINFO.gw[0],gWIZNETINFO.gw[1],gWIZNETINFO.gw[2],gWIZNETINFO.gw[3]);
 	printf("DNS Server : %d.%d.%d.%d\n\r",gWIZNETINFO.dns[0],gWIZNETINFO.dns[1],gWIZNETINFO.dns[2],gWIZNETINFO.dns[3]);
 }
+#endif //MQTT end
 
-
-void testSPI(void)
+int main()
 {
-    uint8_t testData = 0xAA; // Test data to send
-    uint8_t receivedData = 0x00;
+	// INIT MCU
+	avr_init(); // MCU init, including WDT, UART, Timer0, SPI
+	SYS_Init(); // LWM Stack init
 
-    // Send data
-    SPI_WRITE(testData);
+	// Print program metrics
+	strcpy(_msg, "");
+	_len = SPRINTF(_msg,"%S", str_prog_name);// ???????? ?????????
+	HAL_UartWriteString(_msg);
+	
 
-    // Read data
-    SPI_READ(receivedData);
-
-    // Check if the received data matches the sent data
-    if (receivedData == testData)
-    {
-        HAL_UARTWriteString("SPI success\r\n");
-    }
-    else
-    {
-        HAL_UARTWriteString("UASRT failure\r\n");
-    }
-}
-
-
-/*************************************************************************//**
-*****************************************************************************/
-int main(void)
-{
-avr_init(); // Initialize the AVR microcontroller
-SYS_Init(); // LWM init
-
-HAL_UARTWriteString("UASRT success\r\n");
-//startTimerMOJ();
-
-spi_init(); //SPI Master, MODE0, 4Mhz(DIV4), CS_PB.3=HIGH - suitable for WIZNET 5x00(1/2/5)
-testSPI(); //test SPI communication with WIZNET 5x00
-
-IO_LIBRARY_Init(); //After that ping must working
-
-#if defined( PRINT_NTWRK_INFO )
+	//Wizchip WIZ5500 Ethernet initialize
+	IO_LIBRARY_Init(); //After that ping must working
+	
+	#if defined( PRINT_NTWRK_INFO )
 	print_network_information();
 	#endif
 	
-	
-	#ifdef DNS_INFO
-	#if defined( PRINT_DNS_SERVERS )
-	strcpy(_msg, "");
-	_len = 0;
-	_len = SPRINTF(_msg,"\r\n===== DNS Servers =====\r\n");
-	HAL_UARTWriteString(_msg);
-	printf("> DNS 1st : %d.%d.%d.%d\r\n", netInfo.dns[0], netInfo.dns[1], netInfo.dns[2], netInfo.dns[3]);
-	printf("> DNS 2nd : %d.%d.%d.%d\r\n", DNS_2nd[0], DNS_2nd[1], DNS_2nd[2], DNS_2nd[3]);
-	printf("=======================================\r\n");
-	#endif
-	strcpy(_msg, "");
-	_len = 0;
-	_len = SPRINTF(_msg,"> Target Domain Name : %s\r\n", Domain_name);
-	HAL_UARTWriteString(_msg);
-	#endif
 
-	/* DNS client Initialization */
-	DNS_init(SOCK_DNS, gDATABUF_DNS);
-
-	/* DNS processing */
-	int32_t ret;
-	if ((ret = DNS_run(netInfo.dns, Domain_name, Domain_IP)) > 0) // try to 1st DNS
-	{
-		#ifdef DNS_INFO
-		strcpy(_msg, "");
-		_len = 0;
-		_len = SPRINTF(_msg,"> 1st DNS Respond\r\n");
-		HAL_UARTWriteString(_msg);
-		#endif
-	}
-	else if ((ret != -1) && ((ret = DNS_run(DNS_2nd, Domain_name, Domain_IP))>0))     // retry to 2nd DNS
-	{
-		#ifdef DNS_INFO
-		strcpy(_msg, "");
-		_len = 0;
-		_len = SPRINTF(_msg,"> 2nd DNS Respond\r\n");
-		HAL_UARTWriteString(_msg);
-		#endif
-	}
-	else if(ret == -1)
-	{
-		#ifdef DNS_INFO
-		strcpy(_msg, "");
-		_len = 0;
-		_len = SPRINTF(_msg,"> MAX_DOMAIN_NAME is too small. Should be redefined it.\r\n");
-		HAL_UARTWriteString(_msg);
-		#endif
-		;
-	}
-	else
-	{
-		#ifdef DNS_INFO
-		strcpy(_msg, "");
-		_len = 0;
-		_len = SPRINTF(_msg,"> DNS Failed\r\n");
-		HAL_UARTWriteString(_msg);
-		#endif
-		;
-	}
-
-	if(ret > 0)
-	{
-		strcpy(_msg, "");
-		_len = 0;
-		_len = SPRINTF(_msg,"> Translated %s to [%d.%d.%d.%d]\r\n\r\n",Domain_name,Domain_IP[0],Domain_IP[1],Domain_IP[2],Domain_IP[3]);
-		HAL_UARTWriteString(_msg);
-		MQTT_targetIP[0] = Domain_IP[0];
-		MQTT_targetIP[1] = Domain_IP[1];
-		MQTT_targetIP[2] = Domain_IP[2];
-		MQTT_targetIP[3] = Domain_IP[3];
-	}
 
 
 //****************MQTT client initialize
@@ -687,7 +551,7 @@ IO_LIBRARY_Init(); //After that ping must working
 	strcpy(_msg, "");
 	_len = 0;
 	_len = SPRINTF(_msg,">>Trying connect to MQTT broker: %d.%d.%d.%d ..\r\n", MQTT_targetIP[0], MQTT_targetIP[1], MQTT_targetIP[2], MQTT_targetIP[3]);
-	HAL_UARTWriteString(_msg);
+	HAL_UartWriteString(_msg);
 	NewNetwork(&mqtt_network);
 	ConnectNetwork(&mqtt_network, MQTT_targetIP, 1883);
 	MQTTClient(&mqtt_client, &mqtt_network, 1000, mqtt_buf, 100, mqtt_readBuffer, MQTT_BUFFER_SIZE);
@@ -707,14 +571,14 @@ IO_LIBRARY_Init(); //After that ping must working
 		strcpy(_msg, "");
 		_len = 0;
 		_len = SPRINTF(_msg,"++MQTT Connected SUCCESS: %ld\r\n", mqtt_rc);
-		HAL_UARTWriteString(_msg);
+		HAL_UartWriteString(_msg);
 	}
 	else
 	{
 		strcpy(_msg, "");
 		_len = 0;
 		_len = SPRINTF(_msg,"--MQTT Connected ERROR: %ld\r\n", mqtt_rc);
-		HAL_UARTWriteString(_msg);
+		HAL_UartWriteString(_msg);
 		while(1);//Reboot the board
 	}
 
@@ -724,12 +588,12 @@ IO_LIBRARY_Init(); //After that ping must working
 	strcpy(_msg, "");
 	_len = 0;
 	_len = SPRINTF(_msg,"Subscribed (%s) %d\r\n", SubString, mqtt_rc);
-	HAL_UARTWriteString(_msg);
+	HAL_UartWriteString(_msg);
 	
 	//timer
 	uint32_t timer_mqtt_pub_1sec = millis();
 	// counter - 20 sec
-	static uint8_t mqtt_20sec_cnt =0;
+	static uint8_t mqtt_60sec_cnt =0;
 	
 	while(1)
 	{
@@ -747,13 +611,13 @@ IO_LIBRARY_Init(); //After that ping must working
 		 * https://www.hw-group.com/software/hercules-setup-utility
 		 *
 		 */
-		#if defined( _LOOPBACK_TEST )
+		#if defined( LOOPBACK_TEST )
 		/* Loopback Test: TCP Server and UDP */
 		// Test for Ethernet data transfer validation
 		loopback_tcps(0,ethBuf0,5000);
 		loopback_udps(1, ethBuf0, 3000);
 		#endif
-		#if defined( _PING )
+		#if defined( PING )
 		ping_srv(2);
 		#endif
 		
@@ -769,17 +633,17 @@ IO_LIBRARY_Init(); //After that ping must working
 			//here every 1 sec
 			timer_mqtt_pub_1sec = millis();
 			
-			//Every 20sec public message: "Uptime: xxx sec; Free RAM: xxxxx bytes" to "/w5500_avr_dbg"
-			if(++mqtt_20sec_cnt>19)
+			//Every 60 seconds public mqtt message: "Uptime: xxx sec; Free RAM: xxxxx bytes"
+			if(++mqtt_60sec_cnt>60)
 			{
-				mqtt_20sec_cnt = 0;
+				mqtt_60sec_cnt = 0;
 				strcpy(_msg, "");
 				_len = SPRINTF(_msg, "Uptime: %lu sec; Free RAM: %d bytes\r\n", millis()/1000, freeRam());
 				if(_len > 0)
 				{
 					mqtt_pub(&mqtt_client, PUBLISH, _msg, _len);
 				}
-				#if defined( _PING )
+				#if defined( PING )
 				PRINTF("\r\n>> PING my PC\r\n");
 				ping_request(2, ping_ip); //DEVELOPER PC IP
 		
@@ -793,4 +657,3 @@ IO_LIBRARY_Init(); //After that ping must working
 	}
 	return 0;
 }
-
