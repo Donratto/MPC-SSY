@@ -48,15 +48,15 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "../../sys/inc/sysTypes.h"
-#include "../../sys/inc/sysConfig.h"
-#include "../inc/nwk.h"
-#include "../inc/nwkTx.h"
-#include "../inc/nwkFrame.h"
-#include "../inc/nwkRoute.h"
-#include "../inc/nwkGroup.h"
-#include "../inc/nwkCommand.h"
-#include "../inc/nwkRouteDiscovery.h"
+#include "sysTypes.h"
+#include "sysConfig.h"
+#include "nwk.h"
+#include "nwkTx.h"
+#include "nwkFrame.h"
+#include "nwkRoute.h"
+#include "nwkGroup.h"
+#include "nwkCommand.h"
+#include "nwkRouteDiscovery.h"
 
 #ifdef NWK_ENABLE_ROUTING
 

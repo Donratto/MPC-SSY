@@ -50,7 +50,7 @@
 /*- Includes ---------------------------------------------------------------*/
 #include <stdint.h>
 #include "nwk.h"
-#include "../../sys/inc/sysTypes.h"
+#include "sysTypes.h"
 #include "nwkFrame.h"
 
 #ifdef NWK_ENABLE_ROUTE_DISCOVERY

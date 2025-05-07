@@ -50,8 +50,8 @@
 /*- Includes ---------------------------------------------------------------*/
 #include <stdint.h>
 #include <stdbool.h>
-#include "../../sys/inc/sysConfig.h"
-#include "../../sys/inc/sysTypes.h"
+#include "sysConfig.h"
+#include "sysTypes.h"
 
 /*- Types ------------------------------------------------------------------*/
 enum

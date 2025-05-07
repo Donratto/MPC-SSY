@@ -46,8 +46,8 @@
 
 /*- Includes ---------------------------------------------------------------*/
 #include <stdbool.h>
-#include "../../../atmega256rfr2/inc/hal.h"
-#include "../inc/halSleep.h"
+#include "hal.h"
+#include "halSleep.h"
 
 /*- Definitions ------------------------------------------------------------*/
 #define SLEEP_TIMER_CLOCK        32768ul

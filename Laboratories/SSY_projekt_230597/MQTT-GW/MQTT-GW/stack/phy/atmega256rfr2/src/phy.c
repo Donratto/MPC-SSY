@@ -47,10 +47,10 @@
 #ifdef PHY_ATMEGARFR2
 
 /*- Includes ---------------------------------------------------------------*/
-#include "../../../sys/inc/sysTypes.h"
-#include "../../../hal/atmega256rfr2/inc/hal.h"
-#include "../inc/phy.h"
-#include "../inc/atmegarfr2.h"
+#include "sysTypes.h"
+#include "hal.h"
+#include "phy.h"
+#include "atmegarfr2.h"
 
 /*- Definitions ------------------------------------------------------------*/
 #define PHY_CRC_SIZE          2

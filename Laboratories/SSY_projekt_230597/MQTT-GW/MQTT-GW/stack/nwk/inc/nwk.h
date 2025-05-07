@@ -50,7 +50,7 @@
 /*- Includes ---------------------------------------------------------------*/
 #include <stdint.h>
 #include <stdbool.h>
-#include "../../sys/inc/sysConfig.h"
+#include "sysConfig.h"
 #include "nwkRoute.h"
 #include "nwkGroup.h"
 #include "nwkSecurity.h"

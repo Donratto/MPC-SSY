@@ -49,9 +49,9 @@
 
 /*- Includes ---------------------------------------------------------------*/
 #include "sysConfig.h"
-#include "../../phy/atmega256rfr2/inc/phy.h"
-#include "../../nwk/inc/nwk.h"
-#include "../../hal/atmega256rfr2/inc/hal.h"
+#include "phy.h"
+#include "nwk.h"
+#include "hal.h"
 
 /*- Prototypes -------------------------------------------------------------*/
 void SYS_Init(void);

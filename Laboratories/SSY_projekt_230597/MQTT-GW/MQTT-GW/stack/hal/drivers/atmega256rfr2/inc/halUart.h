@@ -49,12 +49,11 @@
 
 /*- Includes ---------------------------------------------------------------*/
 #include <stdint.h>
-#include "../../../../sys/inc/sysConfig.h"
+#include <sysConfig.h>
 
 /*- Prototypes -------------------------------------------------------------*/
 void HAL_UartInit(uint32_t baudrate);
 void HAL_UartWriteByte(uint8_t byte);
-void HAL_UARTWriteString(char *text);
 uint8_t HAL_UartReadByte(void);
 void HAL_UartBytesReceived(uint16_t bytes);
 void HAL_UartTaskHandler(void);

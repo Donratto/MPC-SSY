@@ -48,8 +48,8 @@
 #define _HAL_LED_H_
 
 /*- Includes ---------------------------------------------------------------*/
-#include "../../../atmega256rfr2/inc/hal.h"
-#include "../../../atmega256rfr2/inc/halGpio.h"
+#include "hal.h"
+#include "halGpio.h"
 
 /*- Definitions ------------------------------------------------------------*/
 #if defined(PLATFORM_RCB256RFR2)

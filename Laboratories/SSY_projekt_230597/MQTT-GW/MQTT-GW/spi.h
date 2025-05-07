@@ -24,10 +24,18 @@
 //#define CSN            4  /*SPI - SS*/
 
 //ATMEGA256rfr2 ext3 
-#define SCK            1  /* - Output: SPI Serial Clock (SCLK) - ATMEGA256rfr2 PB1 */
-#define MOSI           2  /* - Output: SPI Master out - slave in (MOSI) -  ATMEGA256rfr2 PB2 */
-#define MISO           3  /* - Input:  SPI Master in - slave out (MISO) -  ATMEGA256rfr2 PB3 */
-#define CSN            7  /*SPI - SS/CS*   PD7*/
+/*
+#define SCK            1  //  Output: SPI Serial Clock (SCLK) - ATMEGA256rfr2 PB1 
+#define MOSI           2  //  Output: SPI Master out - slave in (MOSI) -  ATMEGA256rfr2 PB2 
+#define MISO           3  //  Input:  SPI Master in - slave out (MISO) -  ATMEGA256rfr2 PB3 
+#define CSN            7  //  SPI - SS/CS   PD7  
+*/
+
+//ATMEGA256rfr2 ext2
+#define SCK            1  //  Output: SPI Serial Clock (SCLK) - ATMEGA256rfr2 PB1
+#define MOSI           2  //  Output: SPI Master out - slave in (MOSI) -  ATMEGA256rfr2 PB2
+#define MISO           3  //  Input:  SPI Master in - slave out (MISO) -  ATMEGA256rfr2 PB3
+#define CSN            4  //  SPI - SS/CS   PD4
 
 //#define FLASH_CS       3       /* PB.2 Output as CS*/
 //#define FLASH_CS       2       /* PB.2 Output as CS*/

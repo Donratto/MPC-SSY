@@ -47,9 +47,9 @@
 /*- Includes ---------------------------------------------------------------*/
 #include <stdint.h>
 #include <string.h>
-#include "../inc/sysEncrypt.h"
-#include "../inc/sysConfig.h"
-#include "../../phy/atmega256rfr2/inc/phy.h"
+#include "sysEncrypt.h"
+#include "sysConfig.h"
+#include "phy.h"
 
 #ifdef NWK_ENABLE_SECURITY
 

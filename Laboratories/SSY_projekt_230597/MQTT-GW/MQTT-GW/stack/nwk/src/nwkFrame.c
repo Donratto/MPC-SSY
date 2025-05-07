@@ -49,9 +49,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "../../sys/inc/sysConfig.h"
-#include "../inc/nwk.h"
-#include "../inc/nwkFrame.h"
+#include "sysConfig.h"
+#include "nwk.h"
+#include "nwkFrame.h"
 
 /*- Types ------------------------------------------------------------------*/
 enum

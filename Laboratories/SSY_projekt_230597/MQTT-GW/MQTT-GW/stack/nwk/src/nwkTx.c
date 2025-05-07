@@ -49,15 +49,15 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "../../phy/atmega256rfr2/inc/phy.h"
-#include "../../sys/inc/sysConfig.h"
-#include "../../sys/inc/sysTimer.h"
-#include "../inc/nwk.h"
-#include "../inc/nwkTx.h"
-#include "../inc/nwkFrame.h"
-#include "../inc/nwkRoute.h"
-#include "../inc/nwkCommand.h"
-#include "../inc/nwkSecurity.h"
+#include "phy.h"
+#include "sysConfig.h"
+#include "sysTimer.h"
+#include "nwk.h"
+#include "nwkTx.h"
+#include "nwkFrame.h"
+#include "nwkRoute.h"
+#include "nwkCommand.h"
+#include "nwkSecurity.h"
 
 /*- Definitions ------------------------------------------------------------*/
 #define NWK_TX_ACK_WAIT_TIMER_INTERVAL    50 // ms

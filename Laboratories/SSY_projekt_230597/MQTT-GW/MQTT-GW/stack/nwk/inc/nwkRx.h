@@ -49,7 +49,7 @@
 
 /*- Includes ---------------------------------------------------------------*/
 #include <stdint.h>
-#include "../../sys/inc/sysTypes.h"
+#include "sysTypes.h"
 #include "nwkFrame.h"
 
 /*- Types ------------------------------------------------------------------*/

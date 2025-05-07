@@ -49,7 +49,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "../../sys/inc/sysConfig.h"
+#include "sysConfig.h"
 
 #ifdef NWK_ENABLE_MULTICAST
 

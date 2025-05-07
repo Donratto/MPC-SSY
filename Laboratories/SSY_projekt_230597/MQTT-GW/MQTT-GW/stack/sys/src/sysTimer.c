@@ -46,9 +46,9 @@
 
 /*- Includes ---------------------------------------------------------------*/
 #include <stdlib.h>
-#include "../../hal/atmega256rfr2/inc/hal.h"
-#include "../../hal/atmega256rfr2/inc/halTimer.h"
-#include "../inc/sysTimer.h"
+#include "hal.h"
+#include "halTimer.h"
+#include "sysTimer.h"
 
 /*- Prototypes -------------------------------------------------------------*/
 static void placeTimer(SYS_Timer_t *timer);

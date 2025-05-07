@@ -48,7 +48,7 @@
 #define _HAL_BOARD_H_
 
 /*- Includes ---------------------------------------------------------------*/
-#include "../../../atmega256rfr2/inc/halGpio.h"
+#include "halGpio.h"
 
 /*- Definitions ------------------------------------------------------------*/
 #if defined(PLATFORM_RCB256RFR2)

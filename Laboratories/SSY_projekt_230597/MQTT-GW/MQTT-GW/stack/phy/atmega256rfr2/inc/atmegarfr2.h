@@ -48,7 +48,7 @@
 #define _ATMEGARFR2_H_
 
 /*- Includes ---------------------------------------------------------------*/
-#include "../../../sys/inc/sysTypes.h"
+#include <sysTypes.h>
 
 /*- Definitions ------------------------------------------------------------*/
 #define AES_BLOCK_SIZE                 16

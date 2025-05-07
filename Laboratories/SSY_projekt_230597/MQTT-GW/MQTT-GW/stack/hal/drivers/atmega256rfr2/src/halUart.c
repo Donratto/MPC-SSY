@@ -46,9 +46,9 @@
 
 /*- Includes ---------------------------------------------------------------*/
 #include <stdbool.h>
-#include "../../../atmega256rfr2/inc/hal.h"
-#include "../inc/halUart.h"
-#include "../../../../../config.h"
+#include "hal.h"
+#include "halUart.h"
+#include "config.h"
 
 /*- Definitions ------------------------------------------------------------*/
 #ifndef HAL_UART_TX_FIFO_SIZE
@@ -146,15 +146,6 @@ void HAL_UartWriteByte(uint8_t byte)
   if (txFifo.tail == txFifo.size)
     txFifo.tail = 0;
   txFifo.bytes++;
-}
-
-void HAL_UARTWriteString(char *text)
-{
-	while (*text != 0x00)
-	{
-		HAL_UartWriteByte(*text);
-		text++;
-	}
 }
 
 /*************************************************************************//**

@@ -50,7 +50,7 @@
 /*- Includes ---------------------------------------------------------------*/
 #include <stdint.h>
 #include <stdbool.h>
-#include "../../sys/inc/sysConfig.h"
+#include "sysConfig.h"
 
 /*- Definitions ------------------------------------------------------------*/
 #define NWK_SECURITY_MIC_SIZE        4

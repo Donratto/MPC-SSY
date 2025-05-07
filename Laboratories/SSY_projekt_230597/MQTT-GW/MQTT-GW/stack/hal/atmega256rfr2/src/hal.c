@@ -45,9 +45,9 @@
  */
 
 /*- Includes ---------------------------------------------------------------*/
-#include "../../../sys/inc/sysTypes.h"
-#include "../inc/hal.h"
-#include "../inc/halTimer.h"
+#include "sysTypes.h"
+#include "hal.h"
+#include "halTimer.h"
 
 /*- Implementations --------------------------------------------------------*/
 

@@ -49,12 +49,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "../../sys/inc/sysConfig.h"
-#include "../inc/nwk.h"
-#include "../inc/nwkTx.h"
-#include "../inc/nwkFrame.h"
-#include "../inc/nwkGroup.h"
-#include "../inc/nwkDataReq.h"
+#include "sysConfig.h"
+#include "nwk.h"
+#include "nwkTx.h"
+#include "nwkFrame.h"
+#include "nwkGroup.h"
+#include "nwkDataReq.h"
 
 /*- Types ------------------------------------------------------------------*/
 enum

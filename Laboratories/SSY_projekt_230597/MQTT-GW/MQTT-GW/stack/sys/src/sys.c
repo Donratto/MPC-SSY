@@ -45,12 +45,12 @@
  */
 
 /*- Includes ---------------------------------------------------------------*/
-#include "../inc/sysConfig.h"
-#include "../../phy/atmega256rfr2/inc/phy.h"
-#include "../../nwk/inc/nwk.h"
-#include "../../hal/atmega256rfr2/inc/hal.h"
-#include "../inc/sys.h"
-#include "../inc/sysTimer.h"
+#include "sysConfig.h"
+#include "phy.h"
+#include "nwk.h"
+#include "hal.h"
+#include "sys.h"
+#include "sysTimer.h"
 
 /*- Implementations --------------------------------------------------------*/
 

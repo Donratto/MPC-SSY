@@ -49,15 +49,15 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "../../phy/atmega256rfr2/inc/phy.h"
-#include "../../sys/inc/sysConfig.h"
-#include "../inc/nwkRx.h"
-#include "../inc/nwkTx.h"
-#include "../inc/nwkGroup.h"
-#include "../inc/nwkFrame.h"
-#include "../inc/nwkRoute.h"
-#include "../inc/nwkSecurity.h"
-#include "../inc/nwkRouteDiscovery.h"
+#include "phy.h"
+#include "sysConfig.h"
+#include "nwkRx.h"
+#include "nwkTx.h"
+#include "nwkGroup.h"
+#include "nwkFrame.h"
+#include "nwkRoute.h"
+#include "nwkSecurity.h"
+#include "nwkRouteDiscovery.h"
 
 /*- Variables --------------------------------------------------------------*/
 NwkIb_t nwkIb;

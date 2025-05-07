@@ -49,7 +49,7 @@
 
 /*- Includes ---------------------------------------------------------------*/
 #include <stdint.h>
-#include "../../sys/inc/sysTypes.h"
+#include "sysTypes.h"
 
 /*- Definitions ------------------------------------------------------------*/
 #define NWK_FRAME_MAX_PAYLOAD_SIZE   127

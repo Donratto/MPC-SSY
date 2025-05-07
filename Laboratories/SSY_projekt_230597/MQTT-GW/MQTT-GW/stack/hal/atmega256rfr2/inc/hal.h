@@ -48,10 +48,11 @@
 #define _HAL_H_
 
 /*- Includes ---------------------------------------------------------------*/
-#include "../../../sys/inc/sysTypes.h"
+#include "sysTypes.h"
 
 /*- Prototypes -------------------------------------------------------------*/
 void HAL_Init(void);
 void HAL_Delay(uint8_t us);
 
 #endif // _HAL_H_
+

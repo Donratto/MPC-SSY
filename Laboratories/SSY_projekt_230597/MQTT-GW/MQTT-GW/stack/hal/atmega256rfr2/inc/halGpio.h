@@ -48,7 +48,7 @@
 #define _HAL_GPIO_H_
 
 /*- Includes ---------------------------------------------------------------*/
-#include "../../../sys/inc/sysTypes.h"
+#include "sysTypes.h"
 
 /*- Definitions ------------------------------------------------------------*/
 #define HAL_GPIO_PIN(name, port, bit) \

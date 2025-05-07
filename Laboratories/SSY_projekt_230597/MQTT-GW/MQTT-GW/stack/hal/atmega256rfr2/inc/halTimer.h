@@ -48,7 +48,7 @@
 #define _HAL_TIMER_H_
 
 /*- Includes ---------------------------------------------------------------*/
-#include "../../../sys/inc/sysTypes.h"
+#include "sysTypes.h"
 
 /*- Definitions ------------------------------------------------------------*/
 #define HAL_TIMER_INTERVAL      10ul // ms

@@ -45,8 +45,8 @@
  */
 
 /*- Includes ---------------------------------------------------------------*/
-#include "../inc/hal.h"
-#include "../inc/halTimer.h"
+#include "hal.h"
+#include "halTimer.h"
 
 /*- Definitions ------------------------------------------------------------*/
 #define TIMER_PRESCALER     8

@@ -49,12 +49,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include "../../sys/inc/sysConfig.h"
-#include "../../sys/inc/sysEncrypt.h"
-#include "../inc/nwk.h"
-#include "../inc/nwkTx.h"
-#include "../inc/nwkFrame.h"
-#include "../inc/nwkSecurity.h"
+#include "sysConfig.h"
+#include "sysEncrypt.h"
+#include "nwk.h"
+#include "nwkTx.h"
+#include "nwkFrame.h"
+#include "nwkSecurity.h"
 
 #ifdef NWK_ENABLE_SECURITY
 
@@ -222,4 +222,4 @@ void nwkSecurityTaskHandler(void)
   }
 }
 
-#endif // NWK_ENABLE_SECURITY 
+#endif // NWK_ENABLE_SECURITY
