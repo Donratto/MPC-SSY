@@ -1,71 +1,93 @@
 # LWM->MQTT Gateway
 
-## Popis
-Tento projekt implementuje gateway pro protokol LWM, která přenáší payload z LWM zpráv pomocí protokolu MQTT. Gateway také umožňuje přijímat konfigurační data prostřednictvím MQTT zpráv. Projekt využívá ovladače dostupné na [GitHubu](https://github.com/maxxir/m1284p_wiz5500) a vychází z LWM projektu.
+## Popis projektu
+Cílem projektu je vytvořit gateway pro protokol LWM, která bude:
+1. Odesílat obsah (payload) z LWM zpráv pomocí protokolu MQTT.
+2. Přijímat MQTT zprávy pro konfiguraci.
+
+Projekt využívá ovladače pro Ethernet a MQTT stack dostupné na:  
+[https://github.com/maxxir/m1284p_wiz5500](https://github.com/maxxir/m1284p_wiz5500). Dále využívá knihovnu potokolu LWM [](../../docs/Atmel-42029-Lightweight-Mesh-Getting-Started-Guide_Application-Note_AVR2131.pdf)
 
 ## Nutná nastavení
-1. **Takt oscilátoru**: Nastavte konstantu `F_CPU` podle použitého oscilátoru.
-2. **Definice pro MCU**: Definujte konstanty specifické pro dané MCU, jak je uvedeno v dokumentaci na [Microchip](../../docs/Atmel-42029-Lightweight-Mesh-Getting-Started-Guide_Application-Note_AVR2131.pdf).
-3. **Konfigurace LWM**:
-   - Nastavte proměnné `APP_ADDR`, `APP_PANID` a `APP_ENDPOINT` v souboru `config.h`.
-4. **Konfigurace SPI**:
-   - Upravte piny a porty v souboru `spi.h`.
-   - Podle použitých portů upravte funkci `spi_init()` v souboru `spi.c`.
+Pro správnou funkčnost projektu je nutné provést následující kroky:
+1. **Nastavení oscilátoru**  
+   - Nastavte takt oscilátoru pomocí konstanty `F_CPU` v projektu.
+   - Pro ATmega256RFR2 je doporučeno nastavit `F_CPU` na hodnotu 8 MHz.
+   - Jako další parametry je třeba definovat `PHY_ATMEGARFR2` a `HAL_ATMEGA256RFR2`
 
-## Adresáře obsažené v projektu
+2. **Konfigurace LWM**  
+   - V souboru `config.h` nastavte následující proměnné:
+     - `APP_ADDR`: Adresa aplikace.
+     - `APP_PANID`: Identifikátor PAN sítě.
+     - `APP_ENDPOINT`: Koncový bod aplikace.
 
-### `stack`
-Obsahuje implementace jednotlivých vrstev a služeb protokolu LWM.  
-- **Změny**: V souboru `stack/hal/drivers/atmega256rfr2/src/halUart.c` byla přidána funkce `void HAL_UARTWriteString(char *text)` pro výpis textového řetězce.
+3. **Konfigurace SPI**  
+   - Porty SPI byly nastaveny na rozšiřující rozhraní číslo 2:
+     - **PB1**: SPI CLK
+     - **PB2**: SPI MOSI
+     - **PB3**: SPI MISO
+     - **PD4**: Chip Select (SCS)
+   - V souboru `spi.h` upravte definice pinů a portů pro SPI.
+   - Funkci `spi_init(void)` v souboru `spi.c` přizpůsobte výše uvedeným nastavením, respektive je potřeba nastavit piny jako výstupní v registrech DDRx.
 
-### `Internet`
-Obsahuje adresáře `DNS` a `MQTT`.  
-- `DNS`: Implementace DNS klienta pro překlad doménových jmen.  
-- `MQTT`: Implementace MQTT klienta pro publikování a odběr zpráv.  
-- **Změny**: Nebyly provedeny žádné změny.
+4. **MQTT Konfigurace**  
+   - V souboru `main.c` nastavte:
+     - `MQTT_targetIP`: IP adresa MQTT brokeru.
+     - `ClientID`, `ClientUsername`, `ClientPassword`: Identifikační údaje MQTT klienta.
+     - `SUBSCRIBE`: Téma pro odběr zpráv.
+     - `PUBLISH`: Téma pro odesílání zpráv.
 
-### `Ethernet`
-Obsahuje ovladače pro ethernetový modul W5500.  
-- Používá se pro ICMP (ping), MQTT a DNS komunikaci.  
-- **Změny**: Nebyly provedeny žádné změny.
+## Struktura projektu
+Projekt je rozdělen do několika adresářů:
 
-### `Applications`
-Obsahuje:
-- `PING`: Funkce pro ICMP ping.
-- `loopback`: Funkce pro testování TCP/UDP loopbacku.  
-- **Změny**: Nebyly provedeny žádné změny.
+### 1. **stack**
+- Obsahuje implementace jednotlivých vrstev a služeb protokolu LWM.
+  
+### 2. **Internet**
+- Obsahuje adresáře `DNS` a `MQTT`:
+  - `DNS`: Implementace funkcí pro DNS dotazy.
+  - `MQTT`: Implementace MQTT klienta.
 
-## Další soubory
-- **`spi.h` a `spi.c`**: Implementace SPI sběrnice pro komunikaci s ethernetovým modulem.  
-- **`config.h`**: Definice potřebné pro funkčnost LWM (např. adresa, endpoint).  
-- **`uart_extd.c` a `uart_extd.h`**: Obsahují funkce pro UART, ale nejsou potřeba, protože projekt využívá LWM UART.  
+### 3. **Ethernet**
+- Obsahuje ovladače pro ethernetový modul W5500.
+- Používá se pro odesílání a příjem zpráv protokolů ICMP (PING), MQTT a DNS.
 
----
+### 4. **Applications**
+- Obsahuje:
+  - `PING`: Funkce pro testování PING.
+  - `loopback`: Funkce pro testování loopbacku.
+
+### 5. **Hlavní adresář**
+Obsahuje následující soubory:
+- **`spi.h` a `spi.c`**  
+  - Implementace funkcí pro SPI komunikaci.
+- **`config.h`**  
+  - Definice nutné pro funkčnost LWM.
+- **`makra.h`**  
+  - Obsahuje makra a definice používané v projektu.
 
 ## Funkce
 
-### `void HAL_UARTWriteString(char *text)`
-- Používá funkci `HAL_UartWriteByte()` pro výpis textového řetězce.  
-- **Vstup**: Ukazatel na textový řetězec.
+### 1. `void HAL_UARTWriteString(char *text)`
+- Byla přidána do hlavního souboru `./main.c` v sekci LWM pro výpis textového řetězce.
+- Používá funkci `void HAL_UartWriteByte(uint8_t byte)` pro výpis textového řetězce přes UART, jak samotný název napovídá.
+- **Parametr**: Ukazatel na textový řetězec.
 
-### `static bool appDataInd(NWK_DataInd_t *ind)`
-- Přijímá data pro registrovaný endpoint.  
-- Publikuje payload LWM zprávy pomocí MQTT.  
-- **Vstup**: Ukazatel na strukturu `NWK_DataInd_t`.  
-- **Výstup**: Pravdivostní hodnota (pro rozhodnutí odeslání potvrzujícího rámce).
+### 2. `static bool appDataInd(NWK_DataInd_t *ind)`
+- Zpracovává příchozí data pro registrovaný endpoint.
+- Publikuje payload LWM zprávy pomocí MQTT.
+- **Parametr**: Ukazatel na strukturu `NWK_DataInd_t`.
+- **Návratová hodnota**: Pravdivostní hodnota (pro rozhodnutí odeslání potvrzujícího rámce).
 
-### `void messageArrived(MessageData *md)`
-- Zpracovává přijaté MQTT zprávy.  
-- Umožňuje konfiguraci gateway pomocí MQTT.  
-- **Vstup**: Ukazatel na strukturu `MessageData`.
+### 3. `void messageArrived(MessageData *md)`
+- Zpracovává příchozí MQTT zprávy.
+- Používá se pro konfiguraci pomocí MQTT.
+- **Parametr**: Ukazatel na strukturu `MessageData`.
 
-### `int main()`
-- Inicializuje systém, provádí DNS dotaz na IP adresu MQTT brokeru a připojuje se k němu.  
-- Nastavuje MQTT klienta a přihlašuje se k odběru témat.  
-- V nekonečné smyčce volá funkce `SYS_TaskHandler()`, `HAL_UartTaskHandler()` a `APP_TaskHandler()`.  
-- Publikuje zprávy na téma definované v `PUBLISH` a přijímá zprávy z tématu `SUBSCRIBE`.
-
----
-
-## Závěr
-Projekt implementuje plně funkční gateway mezi LWM a MQTT. Využívá dostupné ovladače a knihovny, přičemž byly provedeny minimální úpravy pro přizpůsobení konkrétnímu hardwaru a požadavkům projektu.
+### 4. `int main()`
+- Inicializuje MCU, LWM stack a MQTT klienta.
+- Provádí DNS dotaz na IP adresu MQTT brokeru.
+- Připojuje se k MQTT brokeru a přihlašuje se k odběru témat.
+- Obsahuje nekonečnou smyčku, která:
+  - Volá LWM funkce: `SYS_TaskHandler()`, `HAL_UartTaskHandler()`, `APP_TaskHandler()`.
+  - Zpracovává MQTT zprávy.
