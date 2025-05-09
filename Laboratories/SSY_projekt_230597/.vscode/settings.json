@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "systypes.h": "c",
-        "sys.h": "c"
+        "sys.h": "c",
+        "socket.h": "c"
     }
 }

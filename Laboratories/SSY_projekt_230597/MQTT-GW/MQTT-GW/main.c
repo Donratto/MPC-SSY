@@ -38,8 +38,8 @@
 
 
 
-//#define PING
-//#define LOOPBACK_TEST
+//#define PING			// Ping test
+//#define LOOPBACK_TEST	// Loopback test
 
 #define LOOPBACK_DATA_BUF_SIZE 512
 //SPI CLOCK 4 Mhz
@@ -58,8 +58,8 @@
 // Receive Buffer
 #define MQTT_BUFFER_SIZE	512     // 2048
 // MQTT topics
-#define PUBLISH "topic/ssy/test"
-#define SUBSCRIBE "topic/ssy/test"
+#define PUBLISH "topic/ssy/pub_test"
+#define SUBSCRIBE "topic/ssy/sub_test"
 // MQTT end
 //LWM
 #ifdef NWK_ENABLE_SECURITY
